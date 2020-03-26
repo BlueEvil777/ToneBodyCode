@@ -5098,13 +5098,18 @@ typedef uint32_t uint_fast32_t;
 
 # 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdbool.h" 1 3
 # 12 "./SPI_Api.h" 2
-# 33 "./SPI_Api.h"
-static uint8_t __enablePin = 0;
+# 31 "./SPI_Api.h"
+typedef struct
+{
+    uint8_t u8EnablePin;
+    uint8_t u8ClkUSDelay;
+    uint8_t u8SPIBits;
+} SPI_Api_pConfig;
 
 
 
 
-uint8_t G_SPI_Api_u8Flags = 0x01 | 0x02;
+uint8_t G_SPI_Api_u8Flags = 0x01 | 0x02 | 0x04;
 
 
 
@@ -5118,7 +5123,9 @@ void SPI_Api_initialize(void);
 
 
 
-_Bool SPI_Api_setEnable(uint8_t _enablePin);
+_Bool SPI_Api_setSpiDevice(SPI_Api_pConfig _config);
+# 64 "./SPI_Api.h"
+_Bool SPI_Api_sendWord(uint32_t word);
 
 
 
@@ -5126,7 +5133,31 @@ _Bool SPI_Api_setEnable(uint8_t _enablePin);
 
 
 
-_Bool sendBit(uint8_t val);
+uint32_t SPI_Api_receiveWord();
+
+
+
+
+
+
+_Bool SPI_Api_begin();
+
+
+
+
+
+
+_Bool SPI_Api_end();
+# 95 "./SPI_Api.h"
+_Bool SPI_Api_sendBit(uint8_t val);
+
+
+
+
+
+
+
+uint8_t SPI_Api_receiveBit();
 # 10 "SPI_Api.c" 2
 
 # 1 "./main.h" 1
@@ -5190,8 +5221,12 @@ _Bool sendBit(uint8_t val);
 
 
 #pragma config EBTRB = OFF
+# 92 "./main.h"
+void DIGITAL_WRITE(uint8_t port, uint8_t pin, uint8_t val);
 # 11 "SPI_Api.c" 2
 
+
+static SPI_Api_pConfig __config = {};
 
 void SPI_Api_initialize(void)
 {
@@ -5207,28 +5242,125 @@ void SPI_Api_initialize(void)
     TRISC &= ~0x04;
 
 
-    G_SPI_Api_u8Flags &= 0x01;
+    G_SPI_Api_u8Flags &= ~0x01;
 }
 
-_Bool SPI_Api_setEnable(uint8_t _enablePin)
+_Bool SPI_Api_setSpiDevice(SPI_Api_pConfig _config)
 {
     uint8_t mask;
-    for(mask = 1; mask != _enablePin ; mask =<< 1);
-
-    if(mask > 0xFF)
+    for(mask = 1; mask != _config.u8EnablePin; mask <<= 1)
     {
-        G_SPI_Api_u8Flags |= 0x02;
-        return 0;
+
+        if(mask == 0x80)
+        {
+            G_SPI_Api_u8Flags |= 0x02;
+            return 0;
+        }
     }
     if(!(_Bool)(G_SPI_Api_u8Flags & 0x04))
+    {
+        G_SPI_Api_u8Flags |= 0x02;
+        G_SPI_Api_u8Flags |= 0x08;
+        return 0;
+    }
 
-    __enablePin = _enablePin;
-    (LATC) = ((1)==1 ? (LATC) | (__enablePin) : (LATC) & ~(__enablePin));
-    G_SPI_Api_u8Flags &= 0x02;
+    __config = _config;
+    DIGITAL_WRITE(LATC, __config.u8EnablePin, (uint8_t)1);
+    G_SPI_Api_u8Flags &= ~0x02;
     return 1;
 }
 
-void sendBit(uint8_t)
+_Bool SPI_Api_begin()
+{
+    if((_Bool)((G_SPI_Api_u8Flags & (0x01 | 0x01 | 0x08)) == 0))
+    {
+        return 0;
+    }
+
+    DIGITAL_WRITE(LATC, __config.u8EnablePin, (uint8_t)0);
+    G_SPI_Api_u8Flags &= ~0x04;
+
+    return 1;
+}
+
+_Bool SPI_Api_end()
+{
+    if((_Bool)((G_SPI_Api_u8Flags & (0x01 | 0x01 | 0x08)) == 0))
+    {
+        return 0;
+    }
+
+    DIGITAL_WRITE(LATC, __config.u8EnablePin, (uint8_t)1);
+    G_SPI_Api_u8Flags |= 0x04;
+
+    return 1;
+}
+
+_Bool SPI_Api_sendWord(uint32_t word)
 {
 
+    if((word >> (__config.u8SPIBits - 1)) > 0)
+    {
+        return 0;
+    }
+    uint32_t mask = 1 << (__config.u8SPIBits);
+    while(mask > 0)
+    {
+        mask >>= 1;
+        if((word & mask) > 0)
+        {
+            SPI_Api_sendBit((uint8_t)1);
+        }
+        else
+        {
+            SPI_Api_sendBit((uint8_t)0);
+        }
+    }
+    return 1;
+}
+
+uint32_t SPI_Api_receiveWord()
+{
+    uint32_t word = 0;
+    uint8_t count = 0;
+    while(count++ < __config.u8SPIBits)
+    {
+        if(count != 1)
+        {
+            word <<= 1;
+        }
+        word |= SPI_Api_receiveBit();
+    }
+    return word;
+}
+
+_Bool SPI_Api_sendBit(uint8_t val)
+{
+
+    if((_Bool)((G_SPI_Api_u8Flags & (0x01 | 0x01 | 0x04 | 0x08)) == 0))
+    {
+        return 0;
+    }
+
+    DIGITAL_WRITE(LATC, 0x01, (uint8_t)0);
+    DIGITAL_WRITE(LATC, 0x04, val);
+    DIGITAL_WRITE(LATC, 0x01, (uint8_t)1);
+
+
+    return 1;
+}
+
+uint8_t SPI_Api_receiveBit()
+{
+
+    if((_Bool)((G_SPI_Api_u8Flags & (0x01 | 0x01 | 0x04 | 0x08)) == 0))
+    {
+        return 2;
+    }
+
+    DIGITAL_WRITE(LATC, 0x01, (uint8_t)0);
+    uint8_t val = (_Bool)((PORTC) & (0x02));
+    DIGITAL_WRITE(LATC, 0x01, (uint8_t)1);
+
+    return val;
 }

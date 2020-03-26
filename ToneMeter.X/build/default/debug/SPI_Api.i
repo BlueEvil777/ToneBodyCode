@@ -1,4 +1,4 @@
-# 1 "main.c"
+# 1 "SPI_Api.c"
 # 1 "<built-in>" 1
 # 1 "<built-in>" 3
 # 288 "<built-in>" 3
@@ -6,75 +6,10 @@
 # 1 "<built-in>" 2
 # 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\language_support.h" 1 3
 # 2 "<built-in>" 2
-# 1 "main.c" 2
+# 1 "SPI_Api.c" 2
 
 
 
-
-
-
-
-# 1 "./main.h" 1
-# 16 "./main.h"
-#pragma config PLLDIV = 1
-#pragma config CPUDIV = OSC1_PLL2
-#pragma config USBDIV = 1
-
-
-#pragma config FOSC = INTOSC_EC
-#pragma config FCMEN = OFF
-#pragma config IESO = OFF
-
-
-#pragma config PWRT = OFF
-#pragma config BOR = ON
-#pragma config BORV = 3
-#pragma config VREGEN = OFF
-
-
-#pragma config WDT = OFF
-#pragma config WDTPS = 32768
-
-
-#pragma config CCP2MX = ON
-#pragma config PBADEN = ON
-#pragma config LPT1OSC = OFF
-#pragma config MCLRE = ON
-
-
-#pragma config STVREN = ON
-#pragma config LVP = ON
-#pragma config XINST = OFF
-
-
-#pragma config CP0 = OFF
-#pragma config CP1 = OFF
-#pragma config CP2 = OFF
-#pragma config CP3 = OFF
-
-
-#pragma config CPB = OFF
-#pragma config CPD = OFF
-
-
-#pragma config WRT0 = OFF
-#pragma config WRT1 = OFF
-#pragma config WRT2 = OFF
-#pragma config WRT3 = OFF
-
-
-#pragma config WRTC = OFF
-#pragma config WRTB = OFF
-#pragma config WRTD = OFF
-
-
-#pragma config EBTR0 = OFF
-#pragma config EBTR1 = OFF
-#pragma config EBTR2 = OFF
-#pragma config EBTR3 = OFF
-
-
-#pragma config EBTRB = OFF
 
 
 
@@ -5072,8 +5007,10 @@ extern __attribute__((nonreentrant)) void _delaywdt(unsigned long);
 #pragma intrinsic(_delay3)
 extern __attribute__((nonreentrant)) void _delay3(unsigned char);
 # 32 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\xc.h" 2 3
-# 79 "./main.h" 2
+# 9 "SPI_Api.c" 2
 
+# 1 "./SPI_Api.h" 1
+# 11 "./SPI_Api.h"
 # 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdint.h" 1 3
 # 22 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdint.h" 3
 # 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\bits/alltypes.h" 1 3
@@ -5157,43 +5094,10 @@ typedef int32_t int_fast32_t;
 typedef uint32_t uint_fast16_t;
 typedef uint32_t uint_fast32_t;
 # 139 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdint.h" 2 3
-# 80 "./main.h" 2
-# 92 "./main.h"
-void DIGITAL_WRITE(uint8_t port, uint8_t pin, uint8_t val);
-# 8 "main.c" 2
-
-# 1 "./OledApi.h" 1
-# 47 "./OledApi.h"
-# 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdarg.h" 1 3
-
-
-
-
-
-
-
-# 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\bits/alltypes.h" 1 3
-
-
-
-
-
-typedef void * va_list[1];
-# 8 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdarg.h" 2 3
-
-
-#pragma intrinsic(__va_start)
-#pragma intrinsic(__va_arg)
-
-extern void * __va_start(void);
-extern void * __va_arg(void *, ...);
-# 47 "./OledApi.h" 2
+# 11 "./SPI_Api.h" 2
 
 # 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdbool.h" 1 3
-# 48 "./OledApi.h" 2
-
-
-# 1 "./SPI_Api.h" 1
+# 12 "./SPI_Api.h" 2
 # 31 "./SPI_Api.h"
 typedef struct
 {
@@ -5254,122 +5158,209 @@ _Bool SPI_Api_sendBit(uint8_t val);
 
 
 uint8_t SPI_Api_receiveBit();
-# 50 "./OledApi.h" 2
-# 106 "./OledApi.h"
- void OledApi_init(uint8_t _enable);
+# 10 "SPI_Api.c" 2
 
- static void begin(uint8_t cols, uint8_t rows);
- void OledApi_clear();
- void OledApi_home();
-
- void OledApi_noDisplay();
- void OledApi_display();
- void OledApi_noBlink();
- void OledApi_blink();
- void OledApi_noCursor();
- void OledApi_cursor();
- void OledApi_scrollDisplayLeft();
- void OledApi_scrollDisplayRight();
- void OledApi_leftToRight();
- void OledApi_rightToLeft();
- void OledApi_autoscroll();
- void OledApi_noAutoscroll();
+# 1 "./main.h" 1
+# 16 "./main.h"
+#pragma config PLLDIV = 1
+#pragma config CPUDIV = OSC1_PLL2
+#pragma config USBDIV = 1
 
 
-    void OledApi_printStr(const char*);
-    void OledApi_printNum(float, int8_t);
-    void OledApi_printf(char*, uint8_t, ...);
-    void OledApi_printSpec(uint8_t);
+#pragma config FOSC = INTOSC_EC
+#pragma config FCMEN = OFF
+#pragma config IESO = OFF
 
 
-
- void OledApi_createChar(uint8_t, uint8_t[]);
- void OledApi_setCursor(uint8_t, uint8_t);
- static void command(uint8_t);
-
-    static void write(uint8_t);
-    static void writeStr(const uint8_t*, uint8_t);
-
- static void send(uint8_t, void *, size_t);
+#pragma config PWRT = OFF
+#pragma config BOR = ON
+#pragma config BORV = 3
+#pragma config VREGEN = OFF
 
 
- static uint8_t _displayfunction;
- static uint8_t _displaycontrol;
- static uint8_t _displaymode;
-# 9 "main.c" 2
-
-# 1 "./ADC_Api.h" 1
-# 45 "./ADC_Api.h"
-void ADC_Api_init(uint8_t);
+#pragma config WDT = OFF
+#pragma config WDTPS = 32768
 
 
-
-static void command(uint8_t _code);
-static void command8(uint8_t);
-static void command24(uint24_t);
-
-static uint8_t recieve8();
-static uint24_t recieve24();
-static uint8_t isDataRdy();
-# 10 "main.c" 2
+#pragma config CCP2MX = ON
+#pragma config PBADEN = ON
+#pragma config LPT1OSC = OFF
+#pragma config MCLRE = ON
 
 
-static uint8_t dc[8] = {
-    0b00000,
-    0b00000,
-    0b11111,
-    0b00000,
-    0b00000,
-    0b11011,
-    0b00000,
-    0b00000
-};
-static uint8_t ac[8] = {
-    0b00000,
-    0b00000,
-    0b00000,
-    0b01010,
-    0b10101,
-    0b00000,
-    0b00000,
-    0b00000
-};
+#pragma config STVREN = ON
+#pragma config LVP = ON
+#pragma config XINST = OFF
 
-void DIGITAL_WRITE(uint8_t port, uint8_t pin, uint8_t val)
+
+#pragma config CP0 = OFF
+#pragma config CP1 = OFF
+#pragma config CP2 = OFF
+#pragma config CP3 = OFF
+
+
+#pragma config CPB = OFF
+#pragma config CPD = OFF
+
+
+#pragma config WRT0 = OFF
+#pragma config WRT1 = OFF
+#pragma config WRT2 = OFF
+#pragma config WRT3 = OFF
+
+
+#pragma config WRTC = OFF
+#pragma config WRTB = OFF
+#pragma config WRTD = OFF
+
+
+#pragma config EBTR0 = OFF
+#pragma config EBTR1 = OFF
+#pragma config EBTR2 = OFF
+#pragma config EBTR3 = OFF
+
+
+#pragma config EBTRB = OFF
+# 92 "./main.h"
+void DIGITAL_WRITE(uint8_t* port, uint8_t pin, uint8_t val);
+# 11 "SPI_Api.c" 2
+
+
+static SPI_Api_pConfig __config = {};
+
+void SPI_Api_initialize(void)
 {
-    if(val == (uint8_t)1)
+
+    if(!(_Bool)(G_SPI_Api_u8Flags & 0x01))
     {
-        port |= pin;
+        return;
     }
-    else
-    {
-        port &= ~pin;
-    }
+
+
+    TRISC &= ~0x01;
+    TRISC |= 0x02;
+    TRISC &= ~0x04;
+
+
+    G_SPI_Api_u8Flags &= ~0x01;
 }
 
-void setup(void) {
+_Bool SPI_Api_setSpiDevice(SPI_Api_pConfig _config)
+{
+    uint8_t mask;
+    for(mask = 1; mask != _config.u8EnablePin; mask <<= 1)
+    {
 
-    OSCCONbits.IRCF = 111;
+        if(mask == 0x80)
+        {
+            G_SPI_Api_u8Flags |= 0x02;
+            return 0;
+        }
+    }
+    if(!(_Bool)(G_SPI_Api_u8Flags & 0x04))
+    {
+        G_SPI_Api_u8Flags |= 0x02;
+        G_SPI_Api_u8Flags |= 0x08;
+        return 0;
+    }
 
-    ADCON1bits.PCFG = 0b1111;
-    SSPCON1bits.SSPEN = 1;
-    SSPCON1bits.SSPM = 0b0010;
-    OledApi_init(0b1000000);
-
-    OledApi_printf("Hi! Int:%n%2f %s %c", 3, 12.6, "Pew!", 0);
-    _delaywdt((unsigned long)((2000)*(8000000/4000.0)));
-    OledApi_createChar(0, dc);
-    OledApi_createChar(1, ac);
+    __config = _config;
+    DIGITAL_WRITE(&LATC, __config.u8EnablePin, (uint8_t)1);
+    G_SPI_Api_u8Flags &= ~0x02;
+    return 1;
 }
 
-void main(void) {
+_Bool SPI_Api_begin()
+{
 
-    setup();
-    static unsigned char count = 0;
 
-    while(1){
-        OledApi_printf("Seconds: %d", 1, (int)count++);
-        _delay((unsigned long)((1000)*(8000000/4000.0)));
-        OledApi_clear();
+
+
+
+    DIGITAL_WRITE(&LATC, __config.u8EnablePin, (uint8_t)0);
+    G_SPI_Api_u8Flags &= ~0x04;
+
+    return 1;
+}
+
+_Bool SPI_Api_end()
+{
+
+
+
+
+
+    DIGITAL_WRITE(&LATC, __config.u8EnablePin, (uint8_t)1);
+    G_SPI_Api_u8Flags |= 0x04;
+
+    return 1;
+}
+
+_Bool SPI_Api_sendWord(uint32_t word)
+{
+
+    if((word >> (__config.u8SPIBits - 1)) > 0)
+    {
+        return 0;
     }
+    uint32_t mask = 1 << (__config.u8SPIBits - 1);
+    while(mask > 0)
+    {
+        if((word & mask) > 0)
+        {
+            SPI_Api_sendBit((uint8_t)1);
+        }
+        else
+        {
+            SPI_Api_sendBit((uint8_t)0);
+        }
+        mask >>= 1;
+    }
+    return 1;
+}
+
+uint32_t SPI_Api_receiveWord()
+{
+    uint32_t word = 0;
+    uint8_t count = 0;
+    while(count++ < __config.u8SPIBits)
+    {
+        if(count != 1)
+        {
+            word <<= 1;
+        }
+        word |= SPI_Api_receiveBit();
+    }
+    return word;
+}
+
+_Bool SPI_Api_sendBit(uint8_t val)
+{
+
+
+
+
+
+
+    DIGITAL_WRITE(&LATC, 0x01, (uint8_t)0);
+    DIGITAL_WRITE(&LATC, 0x04, val);
+    DIGITAL_WRITE(&LATC, 0x01, (uint8_t)1);
+
+
+    return 1;
+}
+
+uint8_t SPI_Api_receiveBit()
+{
+
+
+
+
+
+
+    DIGITAL_WRITE(&LATC, 0x01, (uint8_t)0);
+    uint8_t val = (_Bool)((PORTC) & (0x02));
+    DIGITAL_WRITE(&LATC, 0x01, (uint8_t)1);
+
+    return val;
 }

@@ -5150,12 +5150,81 @@ typedef uint32_t uint_fast32_t;
 
 
 #pragma config EBTRB = OFF
+# 92 "./main.h"
+void DIGITAL_WRITE(uint8_t* port, uint8_t pin, uint8_t val);
 # 40 "./ADC_Api.h" 2
+
+# 1 "./SPI_Api.h" 1
+# 12 "./SPI_Api.h"
+# 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdbool.h" 1 3
+# 12 "./SPI_Api.h" 2
+# 31 "./SPI_Api.h"
+typedef struct
+{
+    uint8_t u8EnablePin;
+    uint8_t u8ClkUSDelay;
+    uint8_t u8SPIBits;
+} SPI_Api_pConfig;
+
+
+
+
+uint8_t G_SPI_Api_u8Flags = 0x01 | 0x02 | 0x04;
+
+
+
+
+
+void SPI_Api_initialize(void);
+
+
+
+
+
+
+
+_Bool SPI_Api_setSpiDevice(SPI_Api_pConfig _config);
+# 64 "./SPI_Api.h"
+_Bool SPI_Api_sendWord(uint32_t word);
+
+
+
+
+
+
+
+uint32_t SPI_Api_receiveWord();
+
+
+
+
+
+
+_Bool SPI_Api_begin();
+
+
+
+
+
+
+_Bool SPI_Api_end();
+# 95 "./SPI_Api.h"
+_Bool SPI_Api_sendBit(uint8_t val);
+
+
+
+
+
+
+
+uint8_t SPI_Api_receiveBit();
+# 41 "./ADC_Api.h" 2
 
 
 
 
 void ADC_Api_init(uint8_t);
+void ADC_Api_config();
 
 
 
@@ -5169,104 +5238,30 @@ static uint8_t isDataRdy();
 # 15 "ADC_Api.c" 2
 
 
-static uint8_t __en_pin = 0;
+static SPI_Api_pConfig __config8, __config24;
 
 void ADC_Api_init(uint8_t _en_pin) {
 
-    __en_pin = _en_pin;
+    __config8.u8EnablePin = __config24.u8EnablePin = _en_pin;
+    __config8.u8SPIBits = 8;
+    __config24.u8SPIBits = 24;
 
 
-    TRISB &= 0b000;
-    TRISB |= 1 << 2;
-    TRISB &= ~__en_pin;
-    LATB |= __en_pin;
+    SPI_Api_initialize();
+    TRISB &= ~_en_pin;
+    LATB |= _en_pin;
 
 
-    SSPCON1 |= 0b100010;
+
 
     _delaywdt((unsigned long)((600)*(8000000/4000.0)));
-
-
-    for(int i = 0; i < 16; i++)
-    {
-        command8(0xff);
-    }
-    command8(0xfe);
-    command8(0x80 | 0x4);
-    command24(0x00040000 | 0x00009000 | 0x00000020);
-    while(!isDataRdy());
-    command8(0x00);
-    uint24_t val = recieve24();
-    if(val == 0)
-        return;
 }
 
-static void command(uint8_t _code)
+void ADC_Api_config()
 {
-    uint8_t TempVar;
-    TempVar = SSPBUF;
 
-    PIR1bits.SSPIF = 0;
-    SSPCON1bits.WCOL = 0;
-    SSPBUF = _code;
-    if ( SSPCON1 & 0x80 )
-        return;
-    else
-        while( !PIR1bits.SSPIF );
-
-    return;
-}
-
-static void command8(uint8_t _code)
-{
-    LATB &= ~__en_pin;
-    command(_code);
-    LATB |= __en_pin;
-}
-
-static void command24(uint24_t _code)
-{
-    for(int i = 0; i < 3; i++)
-    {
-        command(_code & 0xff);
-        _code >> 8;
-    }
-}
-
-static uint8_t recieve8()
-{
-    unsigned char TempVar;
-    TempVar = SSPBUF;
-    PIR1bits.SSPIF = 0;
-    SSPBUF = 0x00;
-    LATB &= ~__en_pin;
-    while(!PIR1bits.SSPIF);
-    LATB |= __en_pin;
-    return SSPBUF;
-}
-
-static uint24_t recieve24()
-{
-    uint24_t code = 0;
-    for(int i = 0; i < 3; i++)
-    {
-        if(code > 0)
-        {
-            code << 8;
-        }
-        code |= recieve8();
-    }
-    return code;
-}
-
-static uint8_t isDataRdy()
-{
-    if(SSPSTATbits.BF)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
+    SPI_Api_setSpiDevice(__config8);
+    SPI_Api_sendWord(0x80 | 0x4);
+    SPI_Api_setSpiDevice(__config24);
+    SPI_Api_sendWord(0x00040000 | 0x00009000 | 0x00000020);
 }

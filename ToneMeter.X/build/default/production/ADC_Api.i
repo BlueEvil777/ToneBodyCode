@@ -5150,19 +5150,26 @@ typedef uint32_t uint_fast32_t;
 
 
 #pragma config EBTRB = OFF
+# 92 "./main.h"
+void DIGITAL_WRITE(uint8_t port, uint8_t pin, uint8_t val);
 # 40 "./ADC_Api.h" 2
 
 # 1 "./SPI_Api.h" 1
 # 12 "./SPI_Api.h"
 # 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdbool.h" 1 3
 # 12 "./SPI_Api.h" 2
-# 33 "./SPI_Api.h"
-static uint8_t __enablePin = 0;
+# 31 "./SPI_Api.h"
+typedef struct
+{
+    uint8_t u8EnablePin;
+    uint8_t u8ClkUSDelay;
+    uint8_t u8SPIBits;
+} SPI_Api_pConfig;
 
 
 
 
-uint8_t G_SPI_Api_u8Flags = 0x01 | 0x02;
+uint8_t G_SPI_Api_u8Flags = 0x01 | 0x02 | 0x04;
 
 
 
@@ -5176,7 +5183,9 @@ void SPI_Api_initialize(void);
 
 
 
-_Bool SPI_Api_setEnable(uint8_t _enablePin);
+_Bool SPI_Api_setSpiDevice(SPI_Api_pConfig _config);
+# 64 "./SPI_Api.h"
+_Bool SPI_Api_sendWord(uint32_t word);
 
 
 
@@ -5184,7 +5193,31 @@ _Bool SPI_Api_setEnable(uint8_t _enablePin);
 
 
 
-_Bool sendBit(uint8_t val);
+uint32_t SPI_Api_receiveWord();
+
+
+
+
+
+
+_Bool SPI_Api_begin();
+
+
+
+
+
+
+_Bool SPI_Api_end();
+# 95 "./SPI_Api.h"
+_Bool SPI_Api_sendBit(uint8_t val);
+
+
+
+
+
+
+
+uint8_t SPI_Api_receiveBit();
 # 41 "./ADC_Api.h" 2
 
 
@@ -5224,7 +5257,7 @@ void ADC_Api_init(uint8_t _en_pin) {
     for(int i = 0; i < 16; i++)
     {
         command8(0xff);
-  Checksum: Debug Image }
+    }
     command8(0xfe);
     command8(0x80 | 0x4);
     command24(0x00040000 | 0x00009000 | 0x00000020);

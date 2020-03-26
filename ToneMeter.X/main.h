@@ -77,16 +77,18 @@
 // #pragma config statements should precede project file includes.
 // Use project enums instead of #define for ON and OFF.
 #include <xc.h>
+#include <stdint.h>
 
 //Defaults to 1MHz
 #define _XTAL_FREQ 8000000
-#define OLED_CS_PIN 0b1000000
-#define HIGH 1
-#define LOW 0
-#define DIGITAL_WRITE(port, pin, val) \
-    (port) = ((val)==HIGH ? (port) | (pin) : (port) & ~(pin))
+#define OLED_CS_PIN 0x40
+#define HIGH (uint8_t)1
+#define LOW (uint8_t)0
 #define DIGITAL_READ(port, pin) (bool)((port) & (pin))
 #define FLAG_SET(flagvar, flag) flagvar |= flag
-#define FLAG_RESET(flagvar, flag) flagvar &= flag
+#define FLAG_RESET(flagvar, flag) flagvar &= ~flag
 #define FLAG_READ(flagvar, flag) (bool)(flagvar & flag)
+
+void DIGITAL_WRITE(uint8_t* port, uint8_t pin, uint8_t val);
+
 #endif	/* MAIN_H */

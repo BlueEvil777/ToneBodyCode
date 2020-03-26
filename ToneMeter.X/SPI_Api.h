@@ -24,8 +24,8 @@
 #define SPI_EN_HIGH_FLAG 0x04
 #define SPI_INTERFERENCE_FLAG 0x08
 
-#define SPI_Api_bIsOk (bool)(G_SLI_Api_u8Flags & (SPI_NOT_INIT_FLAG | SPI_NOT_INIT_FLAG | SPI_EN_HIGH_FLAG | SPI_INTERFERENCE_FLAG) == 0)
-#define SPI_Api_bIsSetup (bool)(G_SLI_Api_u8Flags & (SPI_NOT_INIT_FLAG | SPI_NOT_INIT_FLAG | SPI_INTERFERENCE_FLAG) == 0)
+#define SPI_Api_bIsOk (G_SPI_Api_u8Flags & (SPI_NOT_INIT_FLAG | SPI_NOT_INIT_FLAG | SPI_EN_HIGH_FLAG | SPI_INTERFERENCE_FLAG)) == 0
+#define SPI_Api_bIsSetup (G_SPI_Api_u8Flags & (SPI_NOT_INIT_FLAG | SPI_NOT_INIT_FLAG | SPI_INTERFERENCE_FLAG)) == 0
 /////////////////////////////////////////////////////////////////////////////
 
 typedef struct 
@@ -36,14 +36,9 @@ typedef struct
 } SPI_Api_pConfig;
 
 /**
- * Private Global Enable Pin.
- */
-static SPI_Api_pConfig __config = {};
-
-/**
  * Public Global SPI_Api Flags
  */
-uint8_t G_SPI_Api_u8Flags = SPI_NOT_INIT_FLAG | SPI_EN_PIN_UNSET_FLAG;
+uint8_t G_SPI_Api_u8Flags = SPI_NOT_INIT_FLAG | SPI_EN_PIN_UNSET_FLAG | SPI_EN_HIGH_FLAG;
 
 /**
  * @brief Initializes SPI pins. Note that API will not be ready
@@ -59,17 +54,53 @@ void SPI_Api_initialize(void);
  */
 bool SPI_Api_setSpiDevice(SPI_Api_pConfig _config);
 
+/**
+ * @brief Sends a whole word based on config.
+ * Requires begin
+ * 
+ * @param word
+ * @return bool isSuccessful
+ */
+bool SPI_Api_sendWord(uint32_t word);
+
+/**
+ * @brief Receives a whole word based on config.
+ * Requires begin
+
+ * @return uint32_t cast word based on config size. 
+ */
+uint32_t SPI_Api_receiveWord();
+
+/**
+ * @brief Begin SPI communication.
+ * 
+ * @return isSuccessful
+ */
 bool SPI_Api_begin();
 
+/**
+ * @brief End SPI communication.
+ * 
+ * @return isSuccessful
+ */
 bool SPI_Api_end();
 
 /**
  * @brief sends a bit through SPI
+ * Requires begin
  * 
  * @param val: HIGH or LOW
  * @return bool if send bit was successful without errors
  */
 bool SPI_Api_sendBit(uint8_t val);
+
+/**
+ * @brief receive a bit through SPI
+ * Requires begin
+ * 
+ * @return uint8_t read bit or greater if failed
+ */
+uint8_t SPI_Api_receiveBit();
 
 #endif	/* SPI_API_H */
 

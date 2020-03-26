@@ -48,29 +48,41 @@ Version 4.0 HI-TECH Software Intermediate Code
 "5707
 [; ;C:\Program Files (x86)\Microchip\xc8\v2.10\pic\include\pic18f2550.h: 5707: extern volatile SSPCON1bits_t SSPCON1bits __attribute__((address(0xFC6)));
 [v _SSPCON1bits `VS243 ~T0 @X0 0 e@4038 ]
-"105 ./OledApi.h
-[; ;./OledApi.h: 105:  void OledApi_init(unsigned int enable);
-[v _OledApi_init `(v ~T0 @X0 0 ef1`ui ]
-"44 ./ADC_Api.h
-[; ;./ADC_Api.h: 44: void ADC_Api_init(uint8_t);
+"106 ./OledApi.h
+[; ;./OledApi.h: 106:  void OledApi_init(uint8_t _enable);
+[v _OledApi_init `(v ~T0 @X0 0 ef1`uc ]
+"45 ./ADC_Api.h
+[; ;./ADC_Api.h: 45: void ADC_Api_init(uint8_t);
 [v _ADC_Api_init `(v ~T0 @X0 0 ef1`uc ]
-"127 ./OledApi.h
-[; ;./OledApi.h: 127:     void OledApi_printf(char*, uint8_t, ...);
-[v _OledApi_printf `(v ~T0 @X0 0 e1v`*uc`uc ]
+"108 ./OledApi.h
+[; ;./OledApi.h: 108:  void OledApi_begin(uint8_t cols, uint8_t rows);
+[v _OledApi_begin `(v ~T0 @X0 0 ef2`uc`uc ]
+"46 ./ADC_Api.h
+[; ;./ADC_Api.h: 46: void ADC_Api_config();
+[v _ADC_Api_config `(v ~T0 @X0 0 e? ]
+"134 ./OledApi.h
+[; ;./OledApi.h: 134:  void OledApi_setCursor(uint8_t, uint8_t);
+[v _OledApi_setCursor `(v ~T0 @X0 0 ef2`uc`uc ]
+"126
+[; ;./OledApi.h: 126:     void OledApi_printStr(const char*);
+[v _OledApi_printStr `(v ~T0 @X0 0 ef1`*Cuc ]
 [v F2786 `(v ~T0 @X0 1 tf1`ul ]
 "189 C:\Program Files (x86)\Microchip\xc8\v2.10\pic\include\pic18.h
 [v __delaywdt `JF2786 ~T0 @X0 0 e ]
 [p i __delaywdt ]
-"132 ./OledApi.h
-[; ;./OledApi.h: 132:  void OledApi_createChar(uint8_t, uint8_t[]);
+"133 ./OledApi.h
+[; ;./OledApi.h: 133:  void OledApi_createChar(uint8_t, uint8_t[]);
 [v _OledApi_createChar `(v ~T0 @X0 0 ef2`uc`*uc ]
 [p mainexit ]
+"128
+[; ;./OledApi.h: 128:     void OledApi_printf(char*, uint8_t, ...);
+[v _OledApi_printf `(v ~T0 @X0 0 e1v`*uc`uc ]
 [v F2783 `(v ~T0 @X0 1 tf1`ul ]
 "187 C:\Program Files (x86)\Microchip\xc8\v2.10\pic\include\pic18.h
 [v __delay `JF2783 ~T0 @X0 0 e ]
 [p i __delay ]
-"108 ./OledApi.h
-[; ;./OledApi.h: 108:  void OledApi_clear();
+"109 ./OledApi.h
+[; ;./OledApi.h: 109:  void OledApi_clear();
 [v _OledApi_clear `(v ~T0 @X0 0 e? ]
 "16 ./main.h
 [p x PLLDIV = 1 ]
@@ -620,17 +632,20 @@ Version 4.0 HI-TECH Software Intermediate Code
 "7712
 [; ;C:\Program Files (x86)\Microchip\xc8\v2.10\pic\include\pic18f2550.h: 7712: __asm("TOSU equ 0FFFh");
 [; <" TOSU equ 0FFFh ;# ">
-"142 ./OledApi.h
-[; ;./OledApi.h: 142:  static uint8_t _enable_pin;
-[v __enable_pin `uc ~T0 @X0 1 s ]
-"144
-[; ;./OledApi.h: 144:  static uint8_t _displayfunction;
+"41 ./SPI_Api.h
+[; ;./SPI_Api.h: 41: uint8_t G_SPI_Api_u8Flags = 0x01 | 0x02 | 0x04;
+[v _G_SPI_Api_u8Flags `uc ~T0 @X0 1 e ]
+[i _G_SPI_Api_u8Flags
+-> | | -> 1 `i -> 2 `i -> 4 `i `uc
+]
+"143 ./OledApi.h
+[; ;./OledApi.h: 143:  static uint8_t _displayfunction;
 [v __displayfunction `uc ~T0 @X0 1 s ]
-"145
-[; ;./OledApi.h: 145:  static uint8_t _displaycontrol;
+"144
+[; ;./OledApi.h: 144:  static uint8_t _displaycontrol;
 [v __displaycontrol `uc ~T0 @X0 1 s ]
-"146
-[; ;./OledApi.h: 146:  static uint8_t _displaymode;
+"145
+[; ;./OledApi.h: 145:  static uint8_t _displaymode;
 [v __displaymode `uc ~T0 @X0 1 s ]
 "12 main.c
 [; ;main.c: 12: static uint8_t dc[8] = {
@@ -663,84 +678,137 @@ Version 4.0 HI-TECH Software Intermediate Code
 ..
 ]
 "33
-[; ;main.c: 33: void setup(void) {
+[; ;main.c: 33: void DIGITAL_WRITE(uint8_t* port, uint8_t pin, uint8_t val)
+[v _DIGITAL_WRITE `(v ~T0 @X0 1 ef3`*uc`uc`uc ]
+"34
+[; ;main.c: 34: {
+{
+[e :U _DIGITAL_WRITE ]
+"33
+[; ;main.c: 33: void DIGITAL_WRITE(uint8_t* port, uint8_t pin, uint8_t val)
+[v _port `*uc ~T0 @X0 1 r1 ]
+[v _pin `uc ~T0 @X0 1 r2 ]
+[v _val `uc ~T0 @X0 1 r3 ]
+"34
+[; ;main.c: 34: {
+[f ]
+"35
+[; ;main.c: 35:     if(val == (uint8_t)1)
+[e $ ! == -> _val `i -> -> -> 1 `i `uc `i 329  ]
+"36
+[; ;main.c: 36:     {
+{
+"37
+[; ;main.c: 37:         *port |= pin;
+[e =| *U _port -> _pin `uc ]
+"38
+[; ;main.c: 38:     }
+}
+[e $U 330  ]
+"39
+[; ;main.c: 39:     else
+[e :U 329 ]
+"40
+[; ;main.c: 40:     {
+{
+"41
+[; ;main.c: 41:         *port &= ~pin;
+[e =& *U _port -> ~ -> _pin `i `uc ]
+"42
+[; ;main.c: 42:     }
+}
+[e :U 330 ]
+"43
+[; ;main.c: 43: }
+[e :UE 328 ]
+}
+"45
+[; ;main.c: 45: void setup(void) {
 [v _setup `(v ~T0 @X0 1 ef ]
 {
 [e :U _setup ]
 [f ]
-"35
-[; ;main.c: 35:     OSCCONbits.IRCF = 111;
+"47
+[; ;main.c: 47:     OSCCONbits.IRCF = 111;
 [e = . . _OSCCONbits 0 3 -> -> 111 `i `uc ]
-"37
-[; ;main.c: 37:     ADCON1bits.PCFG = 0b1111;
+"49
+[; ;main.c: 49:     ADCON1bits.PCFG = 0b1111;
 [e = . . _ADCON1bits 0 0 -> -> 15 `i `uc ]
-"38
-[; ;main.c: 38:     SSPCON1bits.SSPEN = 1;
+"50
+[; ;main.c: 50:     SSPCON1bits.SSPEN = 1;
 [e = . . _SSPCON1bits 0 2 -> -> 1 `i `uc ]
-"39
-[; ;main.c: 39:     SSPCON1bits.SSPM = 0b0010;
+"51
+[; ;main.c: 51:     SSPCON1bits.SSPM = 0b0010;
 [e = . . _SSPCON1bits 0 0 -> -> 2 `i `uc ]
-"40
-[; ;main.c: 40:     OledApi_init(0b1000000);
-[e ( _OledApi_init (1 -> -> 64 `i `ui ]
-"41
-[; ;main.c: 41:     ADC_Api_init(0b100);
-[e ( _ADC_Api_init (1 -> -> 4 `i `uc ]
-"42
-[; ;main.c: 42:     OledApi_printf("Hi! Int:%n%2f %s %c", 3, 12.6, "Pew!", 0);
-[e ( _OledApi_printf (1 , , , (. , :s 1C -> -> 3 `i `uc .12.6 :s 2C -> 0 `i ]
-"43
-[; ;main.c: 43:     _delaywdt((unsigned long)((2000)*(8000000/4000.0)));
+"52
+[; ;main.c: 52:     OledApi_init(0x40);
+[e ( _OledApi_init (1 -> -> 64 `i `uc ]
+"53
+[; ;main.c: 53:     ADC_Api_init(0x80);
+[e ( _ADC_Api_init (1 -> -> 128 `i `uc ]
+"54
+[; ;main.c: 54:     OledApi_begin(16,2);
+[e ( _OledApi_begin (2 , -> -> 16 `i `uc -> -> 2 `i `uc ]
+"55
+[; ;main.c: 55:     ADC_Api_config();
+[e ( _ADC_Api_config ..  ]
+"56
+[; ;main.c: 56:     OledApi_setCursor(5,1);
+[e ( _OledApi_setCursor (2 , -> -> 5 `i `uc -> -> 1 `i `uc ]
+"57
+[; ;main.c: 57:     OledApi_printStr("HI");
+[e ( _OledApi_printStr (1 :s 1C ]
+"58
+[; ;main.c: 58:     _delaywdt((unsigned long)((2000)*(8000000/4000.0)));
 [e ( __delaywdt (1 -> * -> -> 2000 `i `d / -> -> 8000000 `l `d .4000.0 `ul ]
-"44
-[; ;main.c: 44:     OledApi_createChar(0, dc);
+"59
+[; ;main.c: 59:     OledApi_createChar(0, dc);
 [e ( _OledApi_createChar (2 , -> -> 0 `i `uc &U _dc ]
-"45
-[; ;main.c: 45:     OledApi_createChar(1, ac);
+"60
+[; ;main.c: 60:     OledApi_createChar(1, ac);
 [e ( _OledApi_createChar (2 , -> -> 1 `i `uc &U _ac ]
-"46
-[; ;main.c: 46: }
-[e :UE 327 ]
+"61
+[; ;main.c: 61: }
+[e :UE 331 ]
 }
 [v $root$_main `(v ~T0 @X0 0 e ]
-"48
-[; ;main.c: 48: void main(void) {
+"63
+[; ;main.c: 63: void main(void) {
 [v _main `(v ~T0 @X0 1 ef ]
 {
 [e :U _main ]
 [f ]
-"50
-[; ;main.c: 50:     setup();
+"65
+[; ;main.c: 65:     setup();
 [e ( _setup ..  ]
-"51
-[; ;main.c: 51:     static unsigned char count = 0;
-[v F2892 `uc ~T0 @X0 1 s count ]
-[i F2892
+"66
+[; ;main.c: 66:     static unsigned char count = 0;
+[v F2915 `uc ~T0 @X0 1 s count ]
+[i F2915
 -> -> 0 `i `uc
 ]
-"53
-[; ;main.c: 53:     while(1){
-[e :U 330 ]
+"68
+[; ;main.c: 68:     while(1){
+[e :U 334 ]
 {
-"54
-[; ;main.c: 54:         OledApi_printf("Seconds: %d", 1, (int)count++);
-[e ( _OledApi_printf (1 , (. , :s 3C -> -> 1 `i `uc -> ++ F2892 -> -> 1 `i `uc `i ]
-"55
-[; ;main.c: 55:         _delay((unsigned long)((1000)*(8000000/4000.0)));
+"69
+[; ;main.c: 69:         OledApi_printf("Seconds: %d", 1, (int)count++);
+[e ( _OledApi_printf (1 , (. , :s 2C -> -> 1 `i `uc -> ++ F2915 -> -> 1 `i `uc `i ]
+"70
+[; ;main.c: 70:         _delay((unsigned long)((1000)*(8000000/4000.0)));
 [e ( __delay (1 -> * -> -> 1000 `i `d / -> -> 8000000 `l `d .4000.0 `ul ]
-"56
-[; ;main.c: 56:         OledApi_clear();
+"71
+[; ;main.c: 71:         OledApi_clear();
 [e ( _OledApi_clear ..  ]
-"57
-[; ;main.c: 57:     }
+"72
+[; ;main.c: 72:     }
 }
-[e :U 329 ]
-[e $U 330  ]
-[e :U 331 ]
-"58
-[; ;main.c: 58: }
-[e :UE 328 ]
+[e :U 333 ]
+[e $U 334  ]
+[e :U 335 ]
+"73
+[; ;main.c: 73: }
+[e :UE 332 ]
 }
-[a 3C 83 101 99 111 110 100 115 58 32 37 100 0 ]
-[a 1C 72 105 33 32 73 110 116 58 37 110 37 50 102 32 37 115 32 37 99 0 ]
-[a 2C 80 101 119 33 0 ]
+[a 2C 83 101 99 111 110 100 115 58 32 37 100 0 ]
+[a 1C 72 73 0 ]

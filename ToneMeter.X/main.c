@@ -30,6 +30,18 @@ static uint8_t ac[8] = {
     0b00000
 };
 
+void DIGITAL_WRITE(uint8_t* port, uint8_t pin, uint8_t val)
+{
+    if(val == HIGH)
+    {
+        *port |= pin;
+    }
+    else
+    {
+        *port &= ~pin;
+    }
+}
+
 void setup(void) {
     
     OSCCONbits.IRCF = 111;
@@ -38,8 +50,11 @@ void setup(void) {
     SSPCON1bits.SSPEN = 1;
     SSPCON1bits.SSPM = 0b0010;
     OledApi_init(OLED_CS_PIN);
-    ADC_Api_init(0b100);
-    OledApi_printf("Hi! Int:%n%2f %s %c", 3, 12.6, "Pew!", 0);
+    ADC_Api_init(0x80);
+    OledApi_begin(16,2);
+    ADC_Api_config();
+    OledApi_setCursor(5,1);
+    OledApi_printStr("HI");
     __delaywdt_ms(2000);
     OledApi_createChar(0, dc);
     OledApi_createChar(1, ac);

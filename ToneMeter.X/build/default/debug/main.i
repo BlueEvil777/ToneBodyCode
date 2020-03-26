@@ -5073,10 +5073,7 @@ extern __attribute__((nonreentrant)) void _delaywdt(unsigned long);
 extern __attribute__((nonreentrant)) void _delay3(unsigned char);
 # 32 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\xc.h" 2 3
 # 79 "./main.h" 2
-# 8 "main.c" 2
 
-# 1 "./OledApi.h" 1
-# 46 "./OledApi.h"
 # 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdint.h" 1 3
 # 22 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdint.h" 3
 # 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\bits/alltypes.h" 1 3
@@ -5160,8 +5157,13 @@ typedef int32_t int_fast32_t;
 typedef uint32_t uint_fast16_t;
 typedef uint32_t uint_fast32_t;
 # 139 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdint.h" 2 3
-# 46 "./OledApi.h" 2
+# 80 "./main.h" 2
+# 92 "./main.h"
+void DIGITAL_WRITE(uint8_t* port, uint8_t pin, uint8_t val);
+# 8 "main.c" 2
 
+# 1 "./OledApi.h" 1
+# 47 "./OledApi.h"
 # 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdarg.h" 1 3
 
 
@@ -5186,10 +5188,77 @@ typedef void * va_list[1];
 extern void * __va_start(void);
 extern void * __va_arg(void *, ...);
 # 47 "./OledApi.h" 2
-# 105 "./OledApi.h"
- void OledApi_init(unsigned int enable);
 
- static void begin(uint8_t cols, uint8_t rows);
+# 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdbool.h" 1 3
+# 48 "./OledApi.h" 2
+
+
+# 1 "./SPI_Api.h" 1
+# 31 "./SPI_Api.h"
+typedef struct
+{
+    uint8_t u8EnablePin;
+    uint8_t u8ClkUSDelay;
+    uint8_t u8SPIBits;
+} SPI_Api_pConfig;
+
+
+
+
+uint8_t G_SPI_Api_u8Flags = 0x01 | 0x02 | 0x04;
+
+
+
+
+
+void SPI_Api_initialize(void);
+
+
+
+
+
+
+
+_Bool SPI_Api_setSpiDevice(SPI_Api_pConfig _config);
+# 64 "./SPI_Api.h"
+_Bool SPI_Api_sendWord(uint32_t word);
+
+
+
+
+
+
+
+uint32_t SPI_Api_receiveWord();
+
+
+
+
+
+
+_Bool SPI_Api_begin();
+
+
+
+
+
+
+_Bool SPI_Api_end();
+# 95 "./SPI_Api.h"
+_Bool SPI_Api_sendBit(uint8_t val);
+
+
+
+
+
+
+
+uint8_t SPI_Api_receiveBit();
+# 50 "./OledApi.h" 2
+# 106 "./OledApi.h"
+ void OledApi_init(uint8_t _enable);
+
+ void OledApi_begin(uint8_t cols, uint8_t rows);
  void OledApi_clear();
  void OledApi_home();
 
@@ -5222,9 +5291,7 @@ extern void * __va_arg(void *, ...);
     static void writeStr(const uint8_t*, uint8_t);
 
  static void send(uint8_t, void *, size_t);
- static void sendBit(uint8_t);
 
- static uint8_t _enable_pin;
 
  static uint8_t _displayfunction;
  static uint8_t _displaycontrol;
@@ -5232,8 +5299,9 @@ extern void * __va_arg(void *, ...);
 # 9 "main.c" 2
 
 # 1 "./ADC_Api.h" 1
-# 44 "./ADC_Api.h"
+# 45 "./ADC_Api.h"
 void ADC_Api_init(uint8_t);
+void ADC_Api_config();
 
 
 
@@ -5268,6 +5336,18 @@ static uint8_t ac[8] = {
     0b00000
 };
 
+void DIGITAL_WRITE(uint8_t* port, uint8_t pin, uint8_t val)
+{
+    if(val == (uint8_t)1)
+    {
+        *port |= pin;
+    }
+    else
+    {
+        *port &= ~pin;
+    }
+}
+
 void setup(void) {
 
     OSCCONbits.IRCF = 111;
@@ -5275,9 +5355,12 @@ void setup(void) {
     ADCON1bits.PCFG = 0b1111;
     SSPCON1bits.SSPEN = 1;
     SSPCON1bits.SSPM = 0b0010;
-    OledApi_init(0b1000000);
-    ADC_Api_init(0b100);
-    OledApi_printf("Hi! Int:%n%2f %s %c", 3, 12.6, "Pew!", 0);
+    OledApi_init(0x40);
+    ADC_Api_init(0x80);
+    OledApi_begin(16,2);
+    ADC_Api_config();
+    OledApi_setCursor(5,1);
+    OledApi_printStr("HI");
     _delaywdt((unsigned long)((2000)*(8000000/4000.0)));
     OledApi_createChar(0, dc);
     OledApi_createChar(1, ac);

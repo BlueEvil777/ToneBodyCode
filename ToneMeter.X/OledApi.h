@@ -45,6 +45,9 @@
 #include <xc.h> // include processor files - each processor file is guarded. 
 #include <stdint.h>
 #include <stdarg.h>
+#include <stdbool.h>
+#include "main.h"
+#include "SPI_Api.h"
 
 #define SPI_PORT            PORTC
 #define SPI_LAT             LATC
@@ -52,7 +55,7 @@
 #define SPI_SCK_PIN			0x01
 #define SPI_MISO_PIN		0x02
 #define SPI_MOSI_PIN		0x04
-#define OLED_IS_8BIT
+#define OLED_IS_4BIT
 #define CHECK_OLED_PRINT_OVERFLOW(x) if(x == 0) exit(1)
 
 // since this device requires 10-bit SPI writes, we have to do software SPI using these pins
@@ -100,9 +103,9 @@
 #define OLED_LANG_RU        0x02
 #define OLED_LANG_EU2       0x03
 
-	void OledApi_init(unsigned int enable);
+	void OledApi_init(uint8_t _enable);
 
-	static void begin(uint8_t cols, uint8_t rows);
+	void OledApi_begin(uint8_t cols, uint8_t rows);
 	void OledApi_clear();
 	void OledApi_home();
 
@@ -135,9 +138,7 @@
     static void writeStr(const uint8_t*, uint8_t);
 
 	static void send(uint8_t, void *, size_t);
-	static void sendBit(uint8_t);
-	
-	static uint8_t _enable_pin;
+	//static void sendBit(uint8_t);
 
 	static uint8_t _displayfunction;
 	static uint8_t _displaycontrol;

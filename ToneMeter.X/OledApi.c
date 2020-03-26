@@ -8,36 +8,38 @@
 
 
 #include "OledApi.h"
-#include "main.h"
 
+static SPI_Api_pConfig __SPIconfig = {};
 
-void OledApi_init(unsigned int enable)
+void OledApi_init(uint8_t _enable)
 {
-	_enable_pin = enable;
 	
-#ifdef OLED_IS_8BIT
+	
+#ifdef OLED_IS_4BIT
 		_displayfunction = OLED_4BITMODE;
 #else
 		_displayfunction = OLED_8BITMODE;
 #endif
 
+    __SPIconfig.u8EnablePin = _enable;
+    __SPIconfig.u8SPIBits = 8;
+    SPI_TRIS &= ~_enable;        //output
+	SPI_LAT |= _enable;          //disable screen
+        
 	// init SPI pins
-    SPI_TRIS &= ~SPI_SCK_PIN;   //output
-    SPI_TRIS |= SPI_MISO_PIN;   //input
-    SPI_TRIS &= ~SPI_MOSI_PIN;  //output
-    SPI_TRIS &= ~enable;        //output
-	SPI_LAT |= enable;          //disable screen
-    
-    begin(16,2);
+    //SPI_TRIS &= ~SPI_SCK_PIN;   //output
+    //SPI_TRIS |= SPI_MISO_PIN;   //input
+    //SPI_TRIS &= ~SPI_MOSI_PIN;  //output
+    SPI_Api_initialize();
+    __delaywdt_ms(1);
 }
 
 // rows and cols are ignore here for now, only supporting 16x2 displays
 // but kept for simpler compatibility with LiquidCrystal library
-static void begin(uint8_t cols, uint8_t rows)
+void OledApi_begin(uint8_t cols, uint8_t rows)
 {
 	// init sequence in 8-bit mode
 	// 1. wait a bit, >=1ms on the datasheet
-    __delaywdt_ms(1);
 	// 2. function set
 	// we're setting 8-bit mode, english here
 	command(OLED_FUNCTIONSET | _displayfunction | OLED_LANG_EN);
@@ -336,11 +338,13 @@ static void send(uint8_t mode, void *buf, size_t count) {
 	if (count == 0)
 		return;
 	
+    uint32_t word;
 	uint8_t head_sent = 0;
 
 	// select the device to start
 	//digitalWrite(_enable_pin, LOW);
-    SPI_LAT &= ~_enable_pin;
+    SPI_Api_setSpiDevice(__SPIconfig);
+    SPI_Api_begin();
 
 	// grab a pointer to the first byte off the buffer
 	uint8_t *p = (uint8_t *)buf;
@@ -348,51 +352,54 @@ static void send(uint8_t mode, void *buf, size_t count) {
 	do {
 		// manually send the first two bits
 		// command = LOW, data = HIGH
-		if (head_sent == 0) {
-            //__delaywdt_us(1);
-			if (mode == OLED_DATA) {
-				sendBit(HIGH);
-				head_sent = 1; // only send this header once for data transmissions
-			} else
-				sendBit(LOW);
-				
-			// read = HIGH, write = LOW
-			// we're always writing in this method, so always send write = LOW
-			sendBit(0);
+        word = 0;
+		if (head_sent == 0) 
+        {
+            if(mode == OLED_DATA)
+            {
+                SPI_Api_sendBit(HIGH);
+            }
+            else
+            {
+                SPI_Api_sendBit(LOW);
+            }
+            SPI_Api_sendBit(LOW);
+            head_sent = 1; // only send this header once for data transmissions
 		}
 	
-		// send the remaining 8 bits one at a time
-		for (uint8_t mask = 0x80; mask; mask >>= 1) {
-			sendBit(mask & *p);
-		}
+		// add the remaining 8 bits from char
+		word |= (uint8_t) *p;
 		
+        //send word;
+        SPI_Api_sendWord(word);
+        
 		// increment the buffer pointer
 		p++;
 	} while (--count > 0);
 	
 	// de-select device
 	//digitalWrite(_enable_pin, HIGH);
-    SPI_LAT |= _enable_pin;
+    SPI_Api_end();
 }
 
 // clock in a single bit
 // according to the data sheet, data is read on the rising edge
-static void sendBit(uint8_t b)
-{
-    //__delaywdt_us(1);
-	//digitalWrite(SPI_SCK_PIN, LOW);
-    SPI_LAT &= ~SPI_SCK_PIN;       //clk low
-	//digitalWrite(SPI_MOSI_PIN, bit);
-    //__delaywdt_us(1);
-    if(b != LOW)
-    {
-        SPI_LAT |= SPI_MOSI_PIN;   //mosi high
-    }
-    else
-    {
-        SPI_LAT &= ~SPI_MOSI_PIN;   //mosi low
-    }
-    //__delaywdt_us(1);
-	//digitalWrite(SPI_SCK_PIN, HIGH);
-    SPI_LAT |= SPI_SCK_PIN;         //clk high
-}
+//static void sendBit(uint8_t b)
+//{
+//    //__delaywdt_us(1);
+//	//digitalWrite(SPI_SCK_PIN, LOW);
+//    SPI_LAT &= ~SPI_SCK_PIN;       //clk low
+//	//digitalWrite(SPI_MOSI_PIN, bit);
+//    //__delaywdt_us(1);
+//    if(b != LOW)
+//    {
+//        SPI_LAT |= SPI_MOSI_PIN;   //mosi high
+//    }
+//    else
+//    {
+//        SPI_LAT &= ~SPI_MOSI_PIN;   //mosi low
+//    }
+//    //__delaywdt_us(1);
+//	//digitalWrite(SPI_SCK_PIN, HIGH);
+//    SPI_LAT |= SPI_SCK_PIN;         //clk high
+//}

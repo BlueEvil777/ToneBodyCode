@@ -5113,50 +5113,9 @@ typedef void * va_list[1];
 extern void * __va_start(void);
 extern void * __va_arg(void *, ...);
 # 47 "./OledApi.h" 2
-# 105 "./OledApi.h"
- void OledApi_init(unsigned int enable);
 
- static void begin(uint8_t cols, uint8_t rows);
- void OledApi_clear();
- void OledApi_home();
-
- void OledApi_noDisplay();
- void OledApi_display();
- void OledApi_noBlink();
- void OledApi_blink();
- void OledApi_noCursor();
- void OledApi_cursor();
- void OledApi_scrollDisplayLeft();
- void OledApi_scrollDisplayRight();
- void OledApi_leftToRight();
- void OledApi_rightToLeft();
- void OledApi_autoscroll();
- void OledApi_noAutoscroll();
-
-
-    void OledApi_printStr(const char*);
-    void OledApi_printNum(float, int8_t);
-    void OledApi_printf(char*, uint8_t, ...);
-    void OledApi_printSpec(uint8_t);
-
-
-
- void OledApi_createChar(uint8_t, uint8_t[]);
- void OledApi_setCursor(uint8_t, uint8_t);
- static void command(uint8_t);
-
-    static void write(uint8_t);
-    static void writeStr(const uint8_t*, uint8_t);
-
- static void send(uint8_t, void *, size_t);
- static void sendBit(uint8_t);
-
- static uint8_t _enable_pin;
-
- static uint8_t _displayfunction;
- static uint8_t _displaycontrol;
- static uint8_t _displaymode;
-# 10 "OledApi.c" 2
+# 1 "C:\\Program Files (x86)\\Microchip\\xc8\\v2.10\\pic\\include\\c99\\stdbool.h" 1 3
+# 48 "./OledApi.h" 2
 
 # 1 "./main.h" 1
 # 16 "./main.h"
@@ -5219,13 +5178,121 @@ extern void * __va_arg(void *, ...);
 
 
 #pragma config EBTRB = OFF
-# 11 "OledApi.c" 2
+# 92 "./main.h"
+void DIGITAL_WRITE(uint8_t* port, uint8_t pin, uint8_t val);
+# 49 "./OledApi.h" 2
 
-
-
-void OledApi_init(unsigned int enable)
+# 1 "./SPI_Api.h" 1
+# 31 "./SPI_Api.h"
+typedef struct
 {
- _enable_pin = enable;
+    uint8_t u8EnablePin;
+    uint8_t u8ClkUSDelay;
+    uint8_t u8SPIBits;
+} SPI_Api_pConfig;
+
+
+
+
+uint8_t G_SPI_Api_u8Flags = 0x01 | 0x02 | 0x04;
+
+
+
+
+
+void SPI_Api_initialize(void);
+
+
+
+
+
+
+
+_Bool SPI_Api_setSpiDevice(SPI_Api_pConfig _config);
+# 64 "./SPI_Api.h"
+_Bool SPI_Api_sendWord(uint32_t word);
+
+
+
+
+
+
+
+uint32_t SPI_Api_receiveWord();
+
+
+
+
+
+
+_Bool SPI_Api_begin();
+
+
+
+
+
+
+_Bool SPI_Api_end();
+# 95 "./SPI_Api.h"
+_Bool SPI_Api_sendBit(uint8_t val);
+
+
+
+
+
+
+
+uint8_t SPI_Api_receiveBit();
+# 50 "./OledApi.h" 2
+# 106 "./OledApi.h"
+ void OledApi_init(uint8_t _enable);
+
+ void OledApi_begin(uint8_t cols, uint8_t rows);
+ void OledApi_clear();
+ void OledApi_home();
+
+ void OledApi_noDisplay();
+ void OledApi_display();
+ void OledApi_noBlink();
+ void OledApi_blink();
+ void OledApi_noCursor();
+ void OledApi_cursor();
+ void OledApi_scrollDisplayLeft();
+ void OledApi_scrollDisplayRight();
+ void OledApi_leftToRight();
+ void OledApi_rightToLeft();
+ void OledApi_autoscroll();
+ void OledApi_noAutoscroll();
+
+
+    void OledApi_printStr(const char*);
+    void OledApi_printNum(float, int8_t);
+    void OledApi_printf(char*, uint8_t, ...);
+    void OledApi_printSpec(uint8_t);
+
+
+
+ void OledApi_createChar(uint8_t, uint8_t[]);
+ void OledApi_setCursor(uint8_t, uint8_t);
+ static void command(uint8_t);
+
+    static void write(uint8_t);
+    static void writeStr(const uint8_t*, uint8_t);
+
+ static void send(uint8_t, void *, size_t);
+
+
+ static uint8_t _displayfunction;
+ static uint8_t _displaycontrol;
+ static uint8_t _displaymode;
+# 10 "OledApi.c" 2
+
+
+static SPI_Api_pConfig __SPIconfig = {};
+
+void OledApi_init(uint8_t _enable)
+{
+
 
 
   _displayfunction = 0x00;
@@ -5233,23 +5300,25 @@ void OledApi_init(unsigned int enable)
 
 
 
+    __SPIconfig.u8EnablePin = _enable;
+    __SPIconfig.u8SPIBits = 8;
+    TRISC &= ~_enable;
+ LATC |= _enable;
 
-    TRISC &= ~0b00000001;
-    TRISC |= 0b00000010;
-    TRISC &= ~0b00000100;
-    TRISC &= ~enable;
- LATC |= enable;
 
-    begin(16,2);
+
+
+
+    SPI_Api_initialize();
+    _delaywdt((unsigned long)((1)*(8000000/4000.0)));
 }
 
 
 
-static void begin(uint8_t cols, uint8_t rows)
+void OledApi_begin(uint8_t cols, uint8_t rows)
 {
 
 
-    _delaywdt((unsigned long)((1)*(8000000/4000.0)));
 
 
  command(0x28 | _displayfunction | 0x00);
@@ -5535,16 +5604,18 @@ static void writeStr(const uint8_t *value, uint8_t len)
 {
  send(1, value, len);
 }
-# 335 "OledApi.c"
+# 337 "OledApi.c"
 static void send(uint8_t mode, void *buf, size_t count) {
  if (count == 0)
   return;
 
+    uint32_t word;
  uint8_t head_sent = 0;
 
 
 
-    LATC &= ~_enable_pin;
+    SPI_Api_setSpiDevice(__SPIconfig);
+    SPI_Api_begin();
 
 
  uint8_t *p = (uint8_t *)buf;
@@ -5552,23 +5623,26 @@ static void send(uint8_t mode, void *buf, size_t count) {
  do {
 
 
-  if (head_sent == 0) {
-
-   if (mode == 1) {
-    sendBit(1);
-    head_sent = 1;
-   } else
-    sendBit(0);
-
-
-
-   sendBit(0);
+        word = 0;
+  if (head_sent == 0)
+        {
+            if(mode == 1)
+            {
+                SPI_Api_sendBit((uint8_t)1);
+            }
+            else
+            {
+                SPI_Api_sendBit((uint8_t)0);
+            }
+            SPI_Api_sendBit((uint8_t)0);
+            head_sent = 1;
   }
 
 
-  for (uint8_t mask = 0x80; mask; mask >>= 1) {
-   sendBit(mask & *p);
-  }
+  word |= (uint8_t) *p;
+
+
+        SPI_Api_sendWord(word);
 
 
   p++;
@@ -5576,27 +5650,5 @@ static void send(uint8_t mode, void *buf, size_t count) {
 
 
 
-    LATC |= _enable_pin;
-}
-
-
-
-static void sendBit(uint8_t b)
-{
-
-
-    LATC &= ~0b00000001;
-
-
-    if(b != 0)
-    {
-        LATC |= 0b00000100;
-    }
-    else
-    {
-        LATC &= ~0b00000100;
-    }
-
-
-    LATC |= 0b00000001;
+    SPI_Api_end();
 }
